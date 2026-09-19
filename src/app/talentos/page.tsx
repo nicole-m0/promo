@@ -1,0 +1,1 @@
+export default function Page() { return <main className="mx-auto max-w-6xl px-5 py-16"><h1 className="text-3xl font-bold">Banco de talentos</h1><p className="mt-3 text-slate-600">Profissionais terão privacidade e controle de visibilidade desde o início.</p></main>; }

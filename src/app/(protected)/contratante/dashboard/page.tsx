@@ -1,0 +1,1 @@
+export default function Page() { return <section><p className="font-semibold text-blue-700">Visão geral</p><h1 className="mt-2 text-3xl font-bold">Sua área de contratação</h1><p className="mt-3 text-slate-600">A gestão de vagas e candidaturas será disponibilizada nas próximas etapas.</p></section>; }

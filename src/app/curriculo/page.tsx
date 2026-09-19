@@ -1,0 +1,1 @@
+export default function Page() { return <main className="mx-auto max-w-6xl px-5 py-16"><h1 className="text-3xl font-bold">Crie seu currículo profissional</h1><p className="mt-3 text-slate-600">O serviço de currículos será implementado na Fase 6.</p></main>; }

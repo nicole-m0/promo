@@ -1,0 +1,1 @@
+export default function Page() { return <main className="mx-auto max-w-6xl px-5 py-16"><h1 className="text-3xl font-bold">Encontre vagas</h1><p className="mt-3 text-slate-600">A busca de oportunidades chega na Fase 3.</p></main>; }

@@ -1,0 +1,3 @@
+import Link from "next/link";
+import { Brand } from "@/components/brand";
+export function SiteHeader() { return <header className="border-b border-slate-200 bg-white/90"><div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4"><Brand /><nav className="hidden gap-6 text-sm font-medium text-slate-600 md:flex"><Link href="/vagas">Encontrar vagas</Link><Link href="/talentos">Banco de talentos</Link><Link href="/curriculo">Criar currículo</Link></nav><div className="flex gap-2 text-sm font-semibold"><Link className="rounded-lg px-3 py-2 text-slate-700" href="/entrar">Entrar</Link><Link className="rounded-lg bg-blue-600 px-4 py-2 text-white" href="/cadastro">Cadastrar-se</Link></div></div></header>; }

@@ -1,0 +1,1 @@
+export default function Page() { return <section><p className="font-semibold text-blue-700">Administração</p><h1 className="mt-2 text-3xl font-bold">Painel Promo Oeiras</h1><p className="mt-3 text-slate-600">A moderação e os indicadores serão adicionados nas fases administrativas.</p></section>; }
