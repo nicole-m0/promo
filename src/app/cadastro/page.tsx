@@ -1,2 +1,20 @@
-import Link from "next/link"; import { Brand } from "@/components/brand";
-export default function Page() { return <main className="grid min-h-screen place-items-center bg-slate-50 px-5"><section className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"><Brand /><h1 className="mt-8 text-2xl font-bold">Crie sua conta</h1><p className="mt-3 text-slate-600">Em breve você poderá escolher entre procurar emprego ou contratar profissionais.</p><Link className="mt-7 inline-flex rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white" href="/">Voltar ao início</Link></section></main>; }
+import type { Metadata } from "next";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { AuthCard } from "@/components/auth-card";
+import { SignupForm } from "@/components/forms/signup-form";
+import { roleHome } from "@/lib/auth/constants";
+import { getCurrentUser } from "@/lib/auth/session";
+
+export const metadata: Metadata = { title: "Criar conta" };
+
+export default async function Page({ searchParams }: { searchParams: Promise<{ tipo?: string | string[] }> }) {
+  const user = await getCurrentUser();
+  if (user) redirect(roleHome[user.role]);
+  const { tipo } = await searchParams;
+  return (
+    <AuthCard description="Escolha como você quer usar a Promo Oeiras." footer={<>Já tem conta? <Link className="font-semibold text-blue-700" href="/entrar">Entrar</Link></>} title="Crie sua conta">
+      <SignupForm initialAccountType={tipo === "contratante" ? "EMPLOYER" : "CANDIDATE"} />
+    </AuthCard>
+  );
+}
