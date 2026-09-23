@@ -10,9 +10,14 @@ export function publicJobWhere(now: Date): Prisma.JobWhereInput {
   return { status: "PUBLISHED", OR: [{ expiresAt: null }, { expiresAt: { gt: now } }] };
 }
 
+/** Mesma regra de publicJobWhere, para uma vaga já carregada (ex.: decidir se o anúncio público existe). */
+export function isPubliclyVisible(job: { status: string; expiresAt: Date | null }, now: Date) {
+  return job.status === "PUBLISHED" && (!job.expiresAt || job.expiresAt > now);
+}
+
 /** Aceita candidaturas: pública e dentro do prazo (o prazo é o fim do dia informado). */
 export function isAcceptingApplications(job: { status: string; applicationDeadline: Date | null; expiresAt: Date | null }, now: Date) {
-  return job.status === "PUBLISHED" && (!job.expiresAt || job.expiresAt > now) && (!job.applicationDeadline || job.applicationDeadline >= now);
+  return isPubliclyVisible(job, now) && (!job.applicationDeadline || job.applicationDeadline >= now);
 }
 
 export type JobFilters = {

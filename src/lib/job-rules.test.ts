@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { deadlineFromInput, deadlineToInput, formatLocation, formatSalary } from "@/lib/job-format";
-import { buildPublicJobWhere, isAcceptingApplications, jobFiltersToQuery, parseJobFilters, publicJobWhere } from "@/lib/job-rules";
+import { buildPublicJobWhere, isAcceptingApplications, isPubliclyVisible, jobFiltersToQuery, parseJobFilters, publicJobWhere } from "@/lib/job-rules";
 
 const now = new Date("2026-09-23T15:00:00Z");
 
@@ -19,6 +19,16 @@ describe("regra de publicação", () => {
     ["encerrada", { status: "CLOSED", applicationDeadline: null, expiresAt: null }, false],
   ])("aceita candidaturas: %s → %s", (_label, job, expected) => {
     expect(isAcceptingApplications(job, now)).toBe(expected);
+  });
+
+  it.each([
+    ["publicada sem expiração", { status: "PUBLISHED", expiresAt: null }, true],
+    ["publicada ainda válida", { status: "PUBLISHED", expiresAt: new Date("2026-10-01") }, true],
+    ["publicada e expirada", { status: "PUBLISHED", expiresAt: new Date("2026-09-01") }, false],
+    ["expira exatamente agora", { status: "PUBLISHED", expiresAt: now }, false],
+    ["pendente", { status: "PENDING", expiresAt: null }, false],
+  ])("anúncio público visível: %s → %s", (_label, job, expected) => {
+    expect(isPubliclyVisible(job, now)).toBe(expected);
   });
 });
 

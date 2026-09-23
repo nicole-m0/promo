@@ -4,6 +4,7 @@ import { JobStatusBadge } from "@/components/jobs/job-status-badge";
 import { requireRole } from "@/lib/auth/session";
 import { EDITABLE_JOB_STATUSES } from "@/lib/job-options";
 import { formatDate, formatLocation } from "@/lib/job-format";
+import { isPubliclyVisible } from "@/lib/job-rules";
 import { getEmployerJobs } from "@/lib/jobs";
 import { workModeLabels } from "@/lib/profile-options";
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = { title: "Minhas vagas" };
 export default async function Page() {
   const user = await requireRole("EMPLOYER");
   const jobs = await getEmployerJobs(user.id);
+  const now = new Date();
   return (
     <section>
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -33,7 +35,7 @@ export default async function Page() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <Link className="text-lg font-bold text-slate-950 hover:text-blue-700" href={`/contratante/vagas/${job.id}`}>{job.title}</Link>
-                  <p className="mt-1 text-sm text-slate-600">{formatLocation(job)} · {workModeLabels[job.workMode]}</p>
+                  <p className="mt-1 text-sm text-slate-600">{formatLocation(job)}{job.workMode !== "REMOTE" && ` · ${workModeLabels[job.workMode]}`}</p>
                 </div>
                 <JobStatusBadge status={job.status} />
               </div>
@@ -45,7 +47,7 @@ export default async function Page() {
               <div className="mt-4 flex flex-wrap gap-4 text-sm font-semibold">
                 <Link className="text-blue-700" href={`/contratante/vagas/${job.id}`}>Ver detalhes</Link>
                 {EDITABLE_JOB_STATUSES.includes(job.status) && <Link className="text-blue-700" href={`/contratante/vagas/${job.id}/editar`}>Editar</Link>}
-                {job.status === "PUBLISHED" && <Link className="text-blue-700" href={`/vagas/${job.id}`}>Ver anúncio</Link>}
+                {isPubliclyVisible(job, now) ? <Link className="text-blue-700" href={`/vagas/${job.id}`}>Ver anúncio</Link> : job.status === "PUBLISHED" && <span className="text-slate-500">Anúncio expirado</span>}
               </div>
             </li>
           ))}

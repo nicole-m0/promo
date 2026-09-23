@@ -7,6 +7,8 @@ import { workModeLabels } from "@/lib/profile-options";
 export function JobCard({ job, now }: { job: JobCardData; now: Date }) {
   const salary = formatSalary(job);
   const open = isAcceptingApplications(job, now);
+  // Set: vaga remota sem cidade gera "Remoto" tanto na localização quanto na modalidade (tag e key duplicadas).
+  const tags = [...new Set([formatLocation(job), workModeLabels[job.workMode], job.employmentType, job.area, salary].filter((tag): tag is string => Boolean(tag)))];
   return (
     <article className="rounded-2xl border border-slate-200 bg-white p-5 transition hover:border-blue-300">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -18,7 +20,7 @@ export function JobCard({ job, now }: { job: JobCardData; now: Date }) {
       </div>
       {job.summary && <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-700">{job.summary}</p>}
       <ul className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-slate-700">
-        {[formatLocation(job), workModeLabels[job.workMode], job.employmentType, job.area, salary].filter(Boolean).map((tag) => <li className="rounded-full bg-slate-100 px-2.5 py-1" key={tag}>{tag}</li>)}
+        {tags.map((tag) => <li className="rounded-full bg-slate-100 px-2.5 py-1" key={tag}>{tag}</li>)}
       </ul>
       {job.applicationDeadline && open && <p className="mt-3 text-xs text-slate-500">Inscrições até {formatDate(job.applicationDeadline)}</p>}
     </article>

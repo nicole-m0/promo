@@ -15,6 +15,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
   const filters = parseJobFilters(await searchParams);
   const now = new Date();
   const [{ jobs, total, pages }, areas] = await Promise.all([searchPublicJobs(filters, now), getPublicJobAreas(now)]);
+  // O filtro de área não diferencia maiúsculas; o select mostra a forma cadastrada. Uma área fora da lista
+  // (ex.: URL antiga ou sem vagas no momento) vira uma opção extra, para o select refletir o filtro aplicado.
+  const selectedArea = filters.area && (areas.find((area) => area.toLowerCase() === filters.area?.toLowerCase()) ?? filters.area);
+  const areaOptions = selectedArea && !areas.includes(selectedArea) ? [selectedArea, ...areas] : areas;
   const hasFilters = Boolean(filters.q || filters.city || filters.state || filters.workMode || filters.employmentType || filters.area || filters.includeClosed);
 
   return (
@@ -30,7 +34,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Rec
           <div><label className={label} htmlFor="uf">UF</label><select className={control} defaultValue={filters.state ?? ""} id="uf" name="uf"><option value="">Todas</option>{BRAZILIAN_STATES.map((uf) => <option key={uf}>{uf}</option>)}</select></div>
           <div><label className={label} htmlFor="modalidade">Modalidade</label><select className={control} defaultValue={filters.workMode ?? ""} id="modalidade" name="modalidade"><option value="">Todas</option>{WORK_MODES.map((mode) => <option key={mode} value={mode}>{workModeLabels[mode]}</option>)}</select></div>
           <div><label className={label} htmlFor="tipo">Contratação</label><select className={control} defaultValue={filters.employmentType ?? ""} id="tipo" name="tipo"><option value="">Todas</option>{EMPLOYMENT_TYPES.map((type) => <option key={type}>{type}</option>)}</select></div>
-          <div><label className={label} htmlFor="area">Área</label><select className={control} defaultValue={filters.area ?? ""} id="area" name="area"><option value="">Todas</option>{areas.map((area) => <option key={area}>{area}</option>)}</select></div>
+          <div><label className={label} htmlFor="area">Área</label><select className={control} defaultValue={selectedArea ?? ""} id="area" name="area"><option value="">Todas</option>{areaOptions.map((area) => <option key={area}>{area}</option>)}</select></div>
           <div className="flex items-end"><label className="flex items-center gap-2 pb-2 text-sm text-slate-700"><input className="size-4 accent-blue-600" defaultChecked={filters.includeClosed} name="encerradas" type="checkbox" value="1" />Incluir inscrições encerradas</label></div>
           <div className="flex gap-3 sm:col-span-2 lg:col-span-4">
             <button className="rounded-lg bg-blue-600 px-5 py-2 font-semibold text-white hover:bg-blue-700" type="submit">Buscar</button>

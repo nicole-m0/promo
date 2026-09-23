@@ -8,6 +8,7 @@ import { JobStatusBadge } from "@/components/jobs/job-status-badge";
 import { requireRole } from "@/lib/auth/session";
 import { EDITABLE_JOB_STATUSES } from "@/lib/job-options";
 import { formatDate } from "@/lib/job-format";
+import { isPubliclyVisible } from "@/lib/job-rules";
 import { getLatestRejectionReason, getOwnedJob } from "@/lib/jobs";
 
 export const metadata: Metadata = { title: "Detalhes da vaga" };
@@ -24,6 +25,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   // Filtra pelo dono: vaga de outra empresa se comporta como inexistente.
   const job = await getOwnedJob(user.id, id);
   if (!job) notFound();
+  const visible = isPubliclyVisible(job, new Date());
   const rejection = job.status === "REJECTED" ? await getLatestRejectionReason(job.id) : null;
 
   return (
@@ -38,9 +40,10 @@ export default async function Page({ params, searchParams }: { params: Promise<{
         </div>
         <div className="flex flex-wrap gap-3 text-sm font-semibold">
           {EDITABLE_JOB_STATUSES.includes(job.status) && <Link className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-800 hover:bg-slate-50" href={`/contratante/vagas/${job.id}/editar`}>Editar</Link>}
-          {job.status === "PUBLISHED" && <Link className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-800 hover:bg-slate-50" href={`/vagas/${job.id}`}>Ver anúncio</Link>}
+          {visible && <Link className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-slate-800 hover:bg-slate-50" href={`/vagas/${job.id}`}>Ver anúncio</Link>}
         </div>
       </div>
+      {job.status === "PUBLISHED" && !visible && <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">O anúncio desta vaga expirou e não aparece mais na busca pública.</p>}
       {job.status === "PENDING" && <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">Esta vaga está em análise pela equipe Promo Oeiras e ainda não aparece na busca pública.</p>}
       {job.status === "REJECTED" && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
